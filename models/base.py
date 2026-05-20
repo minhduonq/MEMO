@@ -81,8 +81,9 @@ class BaseLearner(object):
         grouped = accuracy(y_pred.T[0], y_true, self._known_classes)
         ret["grouped"] = grouped
         ret["top1"] = grouped["total"]
+        actual_topk = y_pred.shape[1] if len(y_pred.shape) > 1 else 1
         ret["top{}".format(self.topk)] = np.around(
-            (y_pred.T == np.tile(y_true, (self.topk, 1))).sum() * 100 / len(y_true),
+            (y_pred.T == np.tile(y_true, (actual_topk, 1))).sum() * 100 / len(y_true),
             decimals=2,
         )
 
@@ -146,7 +147,7 @@ class BaseLearner(object):
             with torch.no_grad():
                 outputs = self._network(inputs)["logits"]
             predicts = torch.topk(
-                outputs, k=self.topk, dim=1, largest=True, sorted=True
+                outputs, k=min(self.topk, outputs.shape[1]), dim=1, largest=True, sorted=True
             )[
                 1
             ]  # [bs, topk]
@@ -163,7 +164,7 @@ class BaseLearner(object):
         dists = cdist(class_means, vectors, "sqeuclidean")  # [nb_classes, N]
         scores = dists.T  # [N, nb_classes], choose the one with the smallest distance
 
-        return np.argsort(scores, axis=1)[:, : self.topk], y_true  # [N, topk]
+        return np.argsort(scores, axis=1)[:, : min(self.topk, scores.shape[1])], y_true  # [N, topk]
 
     def _extract_vectors(self, loader):
         self._network.eval()

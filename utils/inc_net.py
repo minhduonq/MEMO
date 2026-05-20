@@ -681,11 +681,12 @@ class AdaptiveNet(nn.Module):
         weights=self.fc.weight.data
         newnorm=(torch.norm(weights[-increment:,:],p=2,dim=1))
         oldnorm=(torch.norm(weights[:-increment,:],p=2,dim=1))
-        meannew=torch.mean(newnorm)
+        # meannew=torch.mean(newnorm)
         meanold=torch.mean(oldnorm)
-        gamma=meanold/meannew
-        print('alignweights,gamma=',gamma)
-        self.fc.weight.data[-increment:,:]*=gamma
+        gamma=meanold/newnorm
+        print("Áp dụng Perclass WA, gamma=", gamma.mean())
+        # print('alignweights,gamma=',gamma)
+        self.fc.weight.data[-increment:,:]*=gamma.unsqueeze(1)
     
     def load_checkpoint(self, args):
         if args["init_cls"] == 50:

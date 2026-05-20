@@ -1,7 +1,17 @@
 {
-    "memory_per_class":20,
+    "memory_per_class": 20,
     "fixed_memory": false,
     "shuffle": true,
     "model_name": "memo",
-    "seed":[1993]
+    "seed": [
+        1993
+    ],
+    "alpha_relative": 0.6,
+    "geo_loss_freq": 1,
+    "geo_max_classes": 10,
+    "geo_anchors": 2,
+    "geo_buffer_sample": 128,
+    "geo_warmup_start": 30,
+    "geo_warmup_end": 80,
+    "alpha_prototype": 0.5
 }
