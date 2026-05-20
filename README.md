@@ -1,26 +1,11 @@
-# A Model or 603 Exemplars: Towards Memory-Efficient Class-Incremental Learning
-
-The code repository for "[A Model or 603 Exemplars: Towards Memory-Efficient Class-Incremental Learning](https://arxiv.org/abs/2205.13218)" (**ICLR'23 Spotlight**) in PyTorch. If you use any content of this repo for your work, please cite the following bib entry:
-
-```
-@inproceedings{zhou2023model,
-  title={A Model or 603 Exemplars: Towards Memory-Efficient Class-Incremental Learning},
-  author={Zhou, Da-Wei and Wang, Qi-Wei and Ye, Han-Jia and Zhan, De-Chuan},
-  booktitle={ICLR},
-  year={2023}
-}
-```
 
 
-## MEMO: Memory-Efficient expandable MOdel
 
+# GeoPro: Geometric-based Prototypical Feature Space Expansion
 
-Real-world applications require the classification model to adapt to new classes without forgetting old ones. Correspondingly, Class-Incremental Learning (CIL)
-aims to train a model with limited memory size to meet this requirement. Typical CIL methods tend to save representative exemplars from former classes to
-resist forgetting, while recent works find that storing models from history can substantially boost the performance. However, the stored models are not counted
-into the memory budget, which implicitly results in unfair comparisons. We find that when counting the model size into the total budget and comparing methods
-with aligned memory size, saving models do not consistently work, especially for the case with limited memory budgets. As a result, we need to holistically
-evaluate different CIL methods at different memory scales and simultaneously consider accuracy and memory size for measurement. On the other hand, we dive deeply into the construction of the memory buffer for memory efficiency. By analyzing the effect of different layers in the network, we find that shallow and deep layers have different characteristics in CIL. Motivated by this, we propose a simple yet effective baseline, denoted as MEMO for Memory-efficient Expandable MOdel. MEMO extends specialized layers based on the shared generalized representations, efficiently extracting diverse representations with modest cost and maintaining representative exemplars. Extensive experiments on benchmark datasets validate MEMO’s competitive performance.
+This repo contains the implementation of GeoPro, an improvement from MEMO, a class-incremental learning method.
+
+To run the repo on CIFAR100 or ImageNet100 dataset, please refer to the following scripts.
 
 <div align="center">
   <img src="resources/memo.png" width="90%">
@@ -41,18 +26,25 @@ evaluate different CIL methods at different memory scales and simultaneously con
 ```
 python main_memo.py -model memo -init 10 -incre 10 -ms 3312 -net memo_resnet32 -p fair -d 3 --train_base -d 0 1 2 3
 ```
+To run the code on Imagenet100, you MUST download the ImageNet100 dataset and put the link to the dataset in the `utils\data` file.
+link to download ImageNet100: https://www.kaggle.com/datasets/ambityga/imagenet100
+1. sau khi tải dataset về từ kaggle, cần unzip:
+```
+unzip imagenet100.zip -d /root/data/imagenet100/
+```
+rồi gộp các thư mục train.X thành 1 thư mục train duy nhất:
+```
+for dir in /root/data/imagenet100/train.X*/; do
+    cp -r "$dir"*/ /root/data/imagenet100/train/
+done
+```
+Lưu ý sửa lại đường dẫn trên cho đúng với khi chạy thực tế.
 
-## Acknowledgment
-We thank the following repos providing helpful components/functions in our work.
+2. sửa tên mục val.X thành val
 
-- [PyCIL: A Python Toolbox for Class-Incremental Learning](https://github.com/G-U-N/PyCIL)
-- [Deep Class-Incremental Learning: A Survey](https://github.com/zhoudw-zdw/CIL_Survey)
+3. truy cập vào ICLR23-MEMO, vào utils/data, sửa lại link đến dataset imagenet vừa tạo, comment dòng <code>assert 0, "You should specify ..."</code> lại và sửa đường dẫn <code>train_dir, test_dir</code> cho phù hợp
 
-## Contact
-If there are any questions, please feel free to contact with the authors: Da-Wei Zhou (zhoudw@lamda.nju.edu.cn) and Qi-Wei Wang (wangqiwei@lamda.nju.edu.cn). Enjoy the code.
-
-<div align="center">
-
-![visitors](https://visitor-badge.laobi.icu/badge?page_id=zhoudw-zdw.MEMO&left_color=green&right_color=red)
-
-</div>
+- Train Imagenet100
+```
+python main_memo.py --dataset imagenet100 --model_name memo -convnet_type memo_resnet18 --init_cls 10 --increment 10 --device 0 --batch_size 64
+```
